@@ -1,0 +1,6 @@
+[
+{
+  "directory": "/home/belowdecent/Coding/cairolearning/kntrmenu",
+  "arguments": ["/usr/bin/gcc", "-c", "-m64", "-fvisibility=hidden", "-O3", "-D_DEFAULT_SOURCE", "-D_XOPEN_SOURCE=600", "-I", "/usr/include/pango-1.0", "-I", "/usr/include/glib-2.0", "-I", "/usr/lib/glib-2.0/include", "-I", "/usr/include/sysprof-4", "-I", "/usr/include/harfbuzz", "-I", "/usr/include/freetype2", "-I", "/usr/include/libpng16", "-I", "/usr/include/libmount", "-I", "/usr/include/blkid", "-I", "/usr/include/fribidi", "-I", "/usr/include/cairo", "-I", "/usr/include/pixman-1", "-I", "/usr/include/X11/dri", "-pthread", "-DNDEBUG", "-o", "build/.objs/kntrmenu/linux/x86_64/release/src/main.c.o", "src/main.c"],
+  "file": "src/main.c"
+}]
