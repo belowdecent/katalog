@@ -22,15 +22,38 @@ typedef enum FLX_Repeat {
 
 typedef struct FLX_Container {
 	FLX_Direction direction;
-	FLX_Align	main_axis;
-	FLX_Align cross_axis;
-
 	FLX_Repeat repeat_mode;
 
-	KN_FlexSize* main_sizes;
-	KN_FlexSize* cross_sizes;
-	int main_sizes_count;
-	int cross_sizes_count;
+	KN_FlexSize* main;
+	FLX_Align	main_align;
+	int main_count;
+
+	KN_FlexSize* cross;
+	FLX_Align cross_align;
+	int cross_count;
 } FLX_Container;
+
+FLX_Container FLX_ContainerAuto(
+	FLX_Direction direction,
+	FLX_Align main_align,
+	FLX_Align cross_align		
+);
+
+FLX_Container FLX_ContainerNew(
+	FLX_Direction direction,
+	KN_FlexSize*  main,
+	FLX_Align 	  main_align,
+	int 				  main_count,
+	KN_FlexSize*  cross,
+	FLX_Align     cross_align,
+	int           cross_count,
+	FLX_Repeat    repeat_mode
+);
+
+KN_Bounds* FLX_FlexSizesToBounds(
+	FLX_Container* c, 
+	KN_Bounds* parent_bounds, 
+	int child_count
+);
 
 #endif

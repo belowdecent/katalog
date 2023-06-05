@@ -5,7 +5,12 @@ add_requires("X11")
 
 target("layouttest", function ()
     set_kind("binary")
-    add_files("src/layout/*.c")
+    add_files(
+        "src/layout/KN_LayoutTest.c",
+        "src/layout/KN_Element.c",
+        "src/layout/FLX_Container.c",
+        "src/layout/KN_Sizing.c"
+    );
 end)
 
 target("kntrmenu", function ()
