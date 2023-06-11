@@ -1,18 +1,12 @@
 #ifndef _FLX_CONTAINER
 #define _FLX_CONTAINER
 
-#include "KN_Sizing.h"
+#include "FLX_Axis.h"
 
 typedef enum FLX_Direction {
 	FLX_ROW,
 	FLX_COLUMN	
 } FLX_Direction;
-
-typedef enum FLX_Align {
-	FLX_ALIGN_BEGIN,
-	FLX_ALIGN_CENTER,
-	FLX_ALIGN_END,
-} FLX_Align;
 
 typedef enum FLX_Repeat {
 	FLX_REPEAT_LAST,
@@ -24,13 +18,8 @@ typedef struct FLX_Container {
 	FLX_Direction direction;
 	FLX_Repeat repeat_mode;
 
-	KN_FlexSize* main;
-	FLX_Align	main_align;
-	int main_count;
-
-	KN_FlexSize* cross;
-	FLX_Align cross_align;
-	int cross_count;
+	FLX_Axis main;
+	FLX_Axis cross;
 } FLX_Container;
 
 FLX_Container FLX_ContainerAuto(
@@ -48,6 +37,12 @@ FLX_Container FLX_ContainerNew(
 	FLX_Align     cross_align,
 	int           cross_count,
 	FLX_Repeat    repeat_mode
+);
+
+int FLX_FlexSizeToAbsolute(
+	KN_FlexSize size, 
+	double container_size, 
+	int auto_width
 );
 
 KN_Bounds* FLX_FlexSizesToBounds(

@@ -3,23 +3,14 @@ add_rules("mode.debug", "mode.release")
 add_requires("pango")
 add_requires("X11")
 
-target("layouttest", function ()
-    set_kind("binary")
-    add_files(
-        "src/layout/KN_LayoutTest.c",
-        "src/layout/KN_Element.c",
-        "src/layout/FLX_Container.c",
-        "src/layout/KN_Sizing.c"
-    );
-end)
-
 target("kntrmenu", function ()
     set_kind("binary")
-    add_files("src/*.c")
     add_files(
-        "src/layout/KN_Element.c",
+        "src/main.c",
+        "src/render/RNDR_Window.c",
+        "src/layout/FLX_Axis.c",
         "src/layout/FLX_Container.c",
-        "src/layout/KN_Sizing.c"
+        "src/layout/KN_Element.c"
     );
     add_packages("pango")
     add_packages("X11")

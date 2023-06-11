@@ -1,4 +1,6 @@
 #include "cairo.h"
+#include "layout/FLX_Axis.h"
+#include "layout/FLX_Container.h"
 #include "layout/KN_Sizing.h"
 #include "pango/pango-layout.h"
 #include <X11/X.h>
@@ -6,21 +8,13 @@
 #include <pango/pangocairo.h>
 #include <cairo/cairo-xlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "layout/KN_Element.h"
+#include "render/RNDR_Window.h"
 
 #define RADIUS 0
 #define N_WORDS 10
 #define FONT "Inter 27"
-
-typedef struct {
-  Display* dpy;
-  int scr;
-  Window win;
-  GC gc;
-  int width;
-  int height;
-  KeyCode quit_code;
-} KNTR_Window;
 
 static void draw_text(cairo_t* cr) {
   PangoLayout* layout;
@@ -48,40 +42,6 @@ static void draw_text(cairo_t* cr) {
   g_object_unref(layout);
 }
 
-static void KNTR_WindowInit(KNTR_Window* win) {
-  Window root;
-
-  win->width = 512;
-  win->height = 512;
-
-  root = DefaultRootWindow(win->dpy);
-  win->scr = DefaultScreen(win->dpy);
-  win->win = XCreateSimpleWindow(
-    win->dpy, root, 
-    0, 0, 
-    win->width, win->height, 0,
-    BlackPixel(win->dpy, win->scr), 
-    BlackPixel(win->dpy, win->scr)
-  );
-
-  win->quit_code = XKeysymToKeycode(win->dpy, XStringToKeysym("Q"));
-
-  // XSetWindowAttributes set_attr;
-  // set_attr.override_redirect = True;
-  // XChangeWindowAttributes(win->dpy, win->win, CWOverrideRedirect, &set_attr);
-
-  XSelectInput(
-    win->dpy, win->win,
-    KeyPressMask | StructureNotifyMask | ExposureMask
-  );
-
-  XMapWindow(win->dpy, win->win);
-}
-
-static void KNTR_WindowDestroy(KNTR_Window* win) {
-  XDestroyWindow(win->dpy, win->win);
-}
-
 KN_Element* my_stuff() {
   KN_Element* window = malloc(sizeof(KN_Element));
 
@@ -89,38 +49,52 @@ KN_Element* my_stuff() {
 	window->bounds.y = 0;
 	window->bounds.w = 256;
 	window->bounds.h = 256;
-		// .children = malloc(4 * sizeof(KN_Element)),
   window->children = calloc(4, sizeof(KN_Element));
 	window->count = 4;
+  window->padding = KN_PADDING_ALL(KN_UNIT_PX, 5);
 
-	static KN_FlexSize sizes1[4] = {
-		{KN_UnitPX, 128},
-		{KN_UnitAUTO, 0},
-		{KN_UnitAUTO, 0},
-		{KN_UnitPERCENT, 12.5}
-	};
-	static KN_FlexSize autosize[1] = {
-		{KN_UnitAUTO, 0}
-	};
-	static KN_FlexSize v64[1] = {
-		{KN_UnitPX, 64}
-	};
+  window->children[3].children = calloc(3, sizeof(KN_Element));
+  window->children[3].count = 3;
+  window->children[3].padding = KN_PADDING_BLOCK(KN_UNIT_PERCENT, 5);
 
-	window->container = FLX_ContainerNew(
-		FLX_ROW, 
-		sizes1, 
-		FLX_ALIGN_BEGIN, 
-		4, 
-		autosize, 
-		FLX_ALIGN_BEGIN, 
-		1, 
-		FLX_REPEAT_LAST
-	);
+  window->container = (FLX_Container){
+    .direction = FLX_ROW,
+    .repeat_mode = FLX_REPEAT_LAST,
+    .main = { .align = FLX_ALIGN_BEGIN },
+    .cross = { .align = FLX_ALIGN_END },
+  };
+  FLX_SetAxis(&window->container.main, 4, (KN_FlexSize[]){
+		{KN_UNIT_PX, 128},
+		{KN_UNIT_AUTO, 0},
+		{KN_UNIT_AUTO, 0},
+		{KN_UNIT_PERCENT, 12.5}
+  });
+  FLX_SetAxis(&window->container.cross, 4, (KN_FlexSize[]){
+    {KN_UNIT_PERCENT, 100},
+    {KN_UNIT_PERCENT, 50},
+    {KN_UNIT_PERCENT, 25},
+    {KN_UNIT_PERCENT, 75},
+  });
+
+  KN_Element* el = &window->children[3];
+  el->container = (FLX_Container){
+    .direction = FLX_COLUMN,
+    .repeat_mode = FLX_REPEAT_LAST,
+    .main = { .align = FLX_ALIGN_CENTER },
+    .cross = { .align = FLX_ALIGN_CENTER },
+  };
+  FLX_SetAxis(&el->container.main, 1, (KN_FlexSize[]){
+		{KN_UNIT_AUTO, 0},
+  });
+  FLX_SetAxis(&el->container.cross, 1, (KN_FlexSize[]){
+		{KN_UNIT_PX, 10}
+  });
+
 
   return window;
 }
 
-static void win_draw(KNTR_Window* win, KN_Element* my_stuff) {
+static void win_draw(RNDR_Window* win, KN_Element* my_stuff) {
   printf("Drawing: \n");
   cairo_surface_t* surface;
   cairo_t* cr;
@@ -136,27 +110,6 @@ static void win_draw(KNTR_Window* win, KN_Element* my_stuff) {
   );
   cr = cairo_create(surface);
 
-  cairo_set_source_rgb(cr, 1, 1, 1);
-
-  cairo_save(cr);
-
-  draw_text(cr);
-  cairo_set_source_rgb(cr, 1, 0, 1);
-  cairo_rectangle(cr, 20, 20, 150, 150);
-  cairo_fill(cr);
-	// window.children[3].children = malloc(2 * sizeof(KN_Element));
-	// window.children[3].count = 2;
-	// window.children[3].container = FLX_ContainerNew(
-	// 	FLX_ROW, 
-	// 	autosize, 
-	// 	FLX_ALIGN_BEGIN, 
-	// 	1, 
-	// 	v64, 
-	// 	FLX_ALIGN_BEGIN, 
-	// 	1, 
-	// 	FLX_REPEAT_LAST
-	// );
-
   KN_DrawElement(my_stuff, cr);
   if (cairo_status(cr)) {
     printf("Something malicious is brewing: %s\n", 
@@ -165,10 +118,9 @@ static void win_draw(KNTR_Window* win, KN_Element* my_stuff) {
 
   cairo_destroy(cr);
   cairo_surface_destroy(surface);
-
 }
 
-static void win_handle_events(KNTR_Window* win, KN_Element* my_stuff) {
+static void win_handle_events(RNDR_Window* win, KN_Element* my_stuff) {
   XEvent xev;
 
   while (1) {
@@ -204,20 +156,16 @@ static void win_handle_events(KNTR_Window* win, KN_Element* my_stuff) {
 }
 
 int main(void) {
-  KNTR_Window win;
-  win.dpy = XOpenDisplay(0);
-
+  RNDR_Window win = RNDR_InitWindow(XOpenDisplay(0), 512, 512);
   if (win.dpy == NULL) {
     fprintf(stderr, "Failed to open display\n");
     return 1;
   }
 
   KN_Element* thing = my_stuff();
-  KNTR_WindowInit(&win);
   win_draw(&win, thing);
   win_handle_events(&win, thing);
-  KNTR_WindowDestroy(&win);
-
+  XDestroyWindow(win.dpy, win.win);
   XCloseDisplay(win.dpy);  
 
   return 0;

@@ -14,7 +14,7 @@ static void render(KN_Bounds bounds, cairo_t* cr, double r, double g, double b){
   cairo_set_source_rgb(cr, r, g, b);
   cairo_rectangle(cr, bounds.x, bounds.y, bounds.w, bounds.h);
   cairo_fill(cr);
-	printf("An element is drawn (%i, %i, %i, %i)\n",
+	printf("An element is drawn (%f, %f, %f, %f)\n",
 		bounds.x, 
 		bounds.y,
 		bounds.x + bounds.w, 
@@ -40,16 +40,26 @@ int KN_DrawElement(KN_Element* el, cairo_t* cr) {
 		stack = stack->next;
 		
 		if (last_node->element->count > 0) {
+			KN_Element* el = last_node->element;
+			KN_Bounds inner_bounds = el->bounds;
+			inner_bounds.w -= FLX_FlexSizeToAbsolute(el->padding.left,   el->bounds.w, 0);
+			inner_bounds.w -= FLX_FlexSizeToAbsolute(el->padding.right,  el->bounds.w, 0);
+			inner_bounds.h -= FLX_FlexSizeToAbsolute(el->padding.top,    el->bounds.h, 0);
+			inner_bounds.h -= FLX_FlexSizeToAbsolute(el->padding.bottom, el->bounds.h, 0);
+
+			inner_bounds.x += FLX_FlexSizeToAbsolute(el->padding.left,   el->bounds.w, 0);
+			inner_bounds.y += FLX_FlexSizeToAbsolute(el->padding.top,    el->bounds.h, 0);
+
 			KN_Bounds* bounds = FLX_FlexSizesToBounds(
-				&last_node->element->container, 
-				&last_node->element->bounds, 
-				last_node->element->count
+				&el->container, 
+				&inner_bounds, 
+				el->count
 			);
 
-			for (int i = last_node->element->count-1; i >= 0; --i) {
+			for (int i = el->count-1; i >= 0; --i) {
 				KN_ElementStack* new_node = malloc(sizeof(KN_ElementStack));
-				last_node->element->children[i].bounds = bounds[i];
-				new_node->element = &last_node->element->children[i];
+				el->children[i].bounds = bounds[i];
+				new_node->element = &el->children[i];
 				new_node->next = stack;
 				stack = new_node;
 			}

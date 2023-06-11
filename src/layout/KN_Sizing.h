@@ -2,9 +2,9 @@
 #define _KN_SIZING
 
 typedef enum KN_Unit {
-	KN_UnitPX,
-	KN_UnitPERCENT,
-	KN_UnitAUTO
+	KN_UNIT_PX = 0,
+	KN_UNIT_PERCENT = 1,
+	KN_UNIT_AUTO = 2
 } KN_Unit;
 
 typedef struct KN_FlexSize {
@@ -13,17 +13,10 @@ typedef struct KN_FlexSize {
 } KN_FlexSize;
 
 typedef struct KN_Bounds {
-	int x;
-	int y;
-	int w;
-	int h;
+	double x;
+	double y;
+	double w;
+	double h;
 } KN_Bounds;
-
-KN_Bounds* KN_FlexSizesToBounds(
-	KN_Bounds parent_bounds,
-	KN_FlexSize* flex_sizes_h,
-	KN_FlexSize* flex_sizes_v,
-	int count
-);
 
 #endif
