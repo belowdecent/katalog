@@ -31,9 +31,9 @@ int KN_DrawElement(KN_Element* el, cairo_t* cr) {
 
 	while (stack != NULL) {
 		render(stack->element->bounds, cr, 
-			(double)(rand()%90)/100.0,
-			(double)(rand()%90)/100.0, 
-			(double)(rand()%90)/100.0
+			stack->element->color.r,
+			stack->element->color.g, 
+			stack->element->color.b
 		);
 
 		KN_ElementStack* last_node = stack;

@@ -1,4 +1,5 @@
 #include "FLX_Container.h"
+#include "KN_Color.h"
 #include "KN_Sizing.h"
 #include <pango/pangocairo.h>
 
@@ -34,6 +35,9 @@ typedef struct KN_Element {
 	KN_Bounds bounds;
 	KN_Padding padding;
 	FLX_Container container;
+
+	KN_Color color;
+	
 	struct KN_Element* children;
 	int count;
 } KN_Element;

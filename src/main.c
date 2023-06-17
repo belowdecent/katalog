@@ -1,6 +1,7 @@
 #include "cairo.h"
 #include "layout/FLX_Axis.h"
 #include "layout/FLX_Container.h"
+#include "layout/KN_ColorUtils.h"
 #include "layout/KN_Sizing.h"
 #include "pango/pango-layout.h"
 #include <X11/X.h>
@@ -52,6 +53,12 @@ KN_Element* my_stuff() {
   window->children = calloc(4, sizeof(KN_Element));
 	window->count = 4;
   window->padding = KN_PADDING_ALL(KN_UNIT_PX, 5);
+  window->color = KN_RGB_HEX(0x4FC3F7);
+
+  window->children[0].color = KN_RGB_HEX(0xF50057);
+  window->children[1].color = KN_RGB_HEX(0xD500F9);
+  window->children[2].color = KN_RGB_HEX(0x651FFF);
+  window->children[3].color = KN_RGB_HEX(0x1A237E);
 
   window->children[3].children = calloc(3, sizeof(KN_Element));
   window->children[3].count = 3;
@@ -89,6 +96,10 @@ KN_Element* my_stuff() {
   FLX_SetAxis(&el->container.cross, 1, (KN_FlexSize[]){
 		{KN_UNIT_PX, 10}
   });
+
+  el->children[0].color = KN_RGB_HEX(0xFF80AB);
+  el->children[1].color = KN_RGB_HEX(0xEA80FC);
+  el->children[2].color = KN_RGB_HEX(0xB388FF);
 
 
   return window;
